@@ -1,4 +1,14 @@
-use clap::{AppSettings,Parser, Subcommand};
+mod audio_clip;
+
+use audio_clip::AudioKlip;
+
+// Za rad sa komandnom linijom
+use clap::AppSettings;
+use clap::Parser;
+use clap::Subcommand;
+// Za obradu gresaka
+use color_eyre::eyre::Result;
+
 
 #[derive(Parser, Debug)]
 #[clap(name = "SejoKalac")]
@@ -31,18 +41,25 @@ enum Commands{
        
 }
 
-fn main() {
+fn main() -> Result<()> {
+    color_eyre::install()?;
+
     let args = Cli::parse();
     
     match args.command{                     // Switch na osnovu komande
 
         Commands:: Record{name} => {
             eprintln!("Record {:?}", name);
-            todo!();                        // Makro za prazno telo, treba da se uvede obejakt audio_klip sa svojim metodama
+            
+            let name = name.unwrap_or_else(|| "sladja".to_string());
+            let clip = AudioKlip::record(name)?;
+
+            todo!(); //jos baza
         }
 
         Commands:: Play{name} => {
             eprintln!("Play {}", name);
+            todo!();
         }
 
         Commands::List{} => {
