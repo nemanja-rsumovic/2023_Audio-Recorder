@@ -54,6 +54,8 @@ fn main() -> Result<()> {
             let name = name.unwrap_or_else(|| "sladja".to_string());
             let clip = AudioKlip::record(name)?;
 
+
+            clip.play()?;
             todo!(); //jos baza
         }
 
