@@ -6,8 +6,8 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-clap = { version = "3.0.0-rc.9", features = ["derive"] }
-cpal = "0.13.4"
-color-eyre = "0.5.11"
-
-dasp = {version = "0.11.0", features = ["signal", "interpolate", "interpolate-linear"]}
+clap = { version = "3.0.0-rc.9", features = ["derive"] } 								# biblioteka za rad sa arg komandne linije
+cpal = "0.13.4"																			# biblioteka za rad sa audio uredjajima
+color-eyre = "0.5.11"																	# biblioteka za obradu gresaka
+dasp = {version = "0.11.0", features = ["signal", "interpolate", "interpolate-linear"]} # biblioteka za obradu digitalnih audio signala 
+rusqlite = "0.26.3"																		# lite baza podataka za cuvanje semlpova
