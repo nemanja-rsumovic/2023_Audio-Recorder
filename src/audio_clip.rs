@@ -15,7 +15,8 @@ use dasp::Signal;
 // Komponente audioklipa
 #[derive(Clone)]        // zarad dubokog kopiranja pri resamplingu za usaglasavanje
                         // in/out frekvencija
-pub struct AudioKlip {  
+pub struct AudioKlip {
+    pub id: Option<usize>, 
     pub samples: Vec<f32>,
     pub sRates: u32,
 }
@@ -37,6 +38,7 @@ impl AudioKlip {
         let config = device.default_input_config()?;
 
         let clip = AudioKlip {
+            id:None,
             samples: Vec::new(),
             sRates: config.sample_rate().0,
         };
@@ -129,9 +131,7 @@ impl AudioKlip {
         let linear = Linear::new(x, y);
 
         AudioKlip {
-            //id: self.id,
-            //name: self.name.clone(),
-            //date: self.date,
+            id: self.id,
             samples: signal 
                 .from_hz_to_hz(linear, self.sRates as f64, sRates as f64)
                 .take(self.samples.len() * (sRates as usize) / (self.sRates as usize))      //ref2

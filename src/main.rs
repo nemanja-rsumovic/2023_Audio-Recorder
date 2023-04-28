@@ -1,6 +1,8 @@
 mod audio_clip;
+mod baza;
 
 use audio_clip::AudioKlip;
+use baza::Baza;
 
 // Za rad sa komandnom linijom
 use clap::AppSettings;
@@ -45,6 +47,7 @@ fn main() -> Result<()> {
     color_eyre::install()?;
 
     let args = Cli::parse();
+    let baza = Baza::open()?;
     
     match args.command{                     // Switch na osnovu komande
 
@@ -52,7 +55,8 @@ fn main() -> Result<()> {
             eprintln!("Record {:?}", name);
             
             let name = name.unwrap_or_else(|| "sladja".to_string());
-            let clip = AudioKlip::record(name)?;
+            let mut clip = AudioKlip::record(name)?.resample(44100);
+            baza.save(&mut clip);
 
 
             clip.play()?;
