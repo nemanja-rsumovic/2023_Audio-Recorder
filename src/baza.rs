@@ -1,3 +1,5 @@
+extern crate rusqlite;
+
 use color_eyre::eyre::Result;
 use rusqlite::Connection;		// Za upravljanje bazom
 use rusqlite::params;
