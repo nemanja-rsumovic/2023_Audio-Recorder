@@ -3,7 +3,6 @@ extern crate rusqlite;
 use color_eyre::eyre::Result;
 use rusqlite::Connection;		// Za upravljanje bazom
 use rusqlite::params;
-use rusqlite::types::Type;
 
 use crate::audio_clip::AudioKlip;
 
@@ -34,30 +33,27 @@ fn decode(bytes: &[u8]) -> Vec<f32> {
 
 impl Baza{
 	pub fn open() -> Result<Baza> {
-		let connection = Connection::open("sejovaBaza.sqlite")?;
+		let connection = Connection::open("audio_recordings.sqlite")?;
 
-		connection.execute(
-			"
-			CREATE TABLE IF NOT EXISTS baza (
-			id INTEGER PRIMARY KEY,
-			name TEXT NOT NULL UNIQUE,
-			sRates INTEGER NOT NULL,
-			samples BLOB NOT NULL
-			);
-			",
-			[],
-			)?;
+		connection.execute("CREATE TABLE IF NOT EXISTS baza (
+							id INTEGER PRIMARY KEY,
+							name TEXT NOT NULL UNIQUE,
+							s_rates INTEGER NOT NULL,
+							samples BLOB NOT NULL
+						   	); ",
+						   [],
+						)?;
 
 		Ok(Baza(connection))
 	}
 
 	pub fn save(&self, clip: &mut AudioKlip) -> Result<()> {
 		self.0.execute(
-			"INSERT OR REPLACE INTO baza (id, name, sRates, samples) VALUES (?1, ?2, ?3, ?4)",
+			"INSERT OR REPLACE INTO baza (id, name, s_rates, samples) VALUES (?1, ?2, ?3, ?4)",
 			params![
 			clip.id,
 			clip.name,
-			clip.sRates,
+			clip.s_rates,
 			encode(&clip.samples),
 			],
 			)?;
@@ -69,14 +65,14 @@ impl Baza{
 	}
 
 	pub fn load(&self, name: &str) -> Result<Option<AudioKlip>> {
-		let mut stm = self.0.prepare("SELECT id, name, sRates, samples FROM baza WHERE name = ?1")?;
+		let mut stm = self.0.prepare("SELECT id, name, s_rates, samples FROM baza WHERE name = ?1")?;
 		let mut st_mach = stm.query_map([name], |row| {		// Kao state masina iz grafike, prvo je napravimo pa je podignemo
 			let sampl: Vec<u8> = row.get(3)?;
 
 			Ok(AudioKlip{
 				id: Some(row.get(0)?),
 				name: row.get(1)?,
-				sRates: row.get(2)?,
+				s_rates: row.get(2)?,
 				samples: decode(&sampl),
 			})
 		})?;												// bez ? - query_map, sa ? - (query_map, err) 
@@ -92,7 +88,7 @@ impl Baza{
 	}
 
 	pub fn list(&self) -> Result<Vec<Podaci>>{
-		let mut stm = self.0.prepare("SELECT id, name FROM baza ORDER BY name")?;
+		let mut stm = self.0.prepare("SELECT id, name FROM baza ORDER BY id")?;
 		let st_mach = stm.query_map([], |row| {
 			Ok(Podaci{
 				id: row.get(0)?,

@@ -19,7 +19,7 @@ pub struct AudioKlip {
     pub id: Option<usize>,
     pub name: String,
     pub samples: Vec<f32>,
-    pub sRates: u32,
+    pub s_rates: u32,
 }
 
 impl AudioKlip {
@@ -42,7 +42,7 @@ impl AudioKlip {
             id: None,
             name,  
             samples: Vec::new(),
-            sRates: config.sample_rate().0,
+            s_rates: config.sample_rate().0,
         };
 
         let clip = Arc::new(Mutex::new(Some(clip)));
@@ -50,7 +50,7 @@ impl AudioKlip {
         let clip1 = clip.clone();
 
         //begin recording...
-        println!("Snimanje zapoceto...");
+        println!("\nSnimanje zapoceto:\n.\n.\n.");
 
         let channels = config.channels();
 
@@ -107,7 +107,7 @@ impl AudioKlip {
 
         let clip = clip.lock().unwrap().take().unwrap();
 
-        println!("Snimljeno: {}", clip.samples.len());
+        println!("Snimljeno je {} semplova.", clip.samples.len());
 
         Ok(clip)
 
@@ -119,9 +119,9 @@ impl AudioKlip {
 
     // resamplovanje-usaglasavanje frekvencija IO
 
-    pub fn resample(&self, sRates: u32) -> AudioKlip {
+    pub fn resample(&self, s_rates: u32) -> AudioKlip {
         
-        if self.sRates == sRates {
+        if self.s_rates == s_rates {
             return self.clone();
         }
 
@@ -136,10 +136,10 @@ impl AudioKlip {
             id: self.id,
             name: self.name.clone(),
             samples: signal 
-                .from_hz_to_hz(linear, self.sRates as f64, sRates as f64)
-                .take(self.samples.len() * (sRates as usize) / (self.sRates as usize))      //ref2
+                .from_hz_to_hz(linear, self.s_rates as f64, s_rates as f64)
+                .take(self.samples.len() * (s_rates as usize) / (self.s_rates as usize))      //ref2
                 .collect(),
-            sRates,
+            s_rates,
         }
     }
 
@@ -154,7 +154,7 @@ impl AudioKlip {
             
         let config = device.default_output_config()?;
 
-        println!("Reprodukcija snimka:");
+        println!("\nReprodukcija snimka u toku:\n.\n.\n.");
 
         type StateHandle = Arc<Mutex<Option<(usize, Vec<f32>)>>>;
         
@@ -208,6 +208,8 @@ impl AudioKlip {
 
         stream.play()?;
         std::thread::sleep(std::time::Duration::from_secs(5));
+
+        println!("Reprodukcija snimka zavrsena.");
 
         Ok(())
         

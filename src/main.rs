@@ -13,7 +13,7 @@ use color_eyre::eyre::Result;
 
 
 #[derive(Parser, Debug)]
-#[clap(name = "SejoKalac")]
+#[clap(name = "2023_Audio-Recorder")]
 #[clap(about = "Pozz")]
 
 struct Cli{             // Cli za parsiranje komandi i formiranje strukture od njih
@@ -52,16 +52,16 @@ fn main() -> Result<()> {
     match args.command{                     // Switch na osnovu komande
 
         Commands::Record { name } => {
-            println!("Snimanje {:?}", name);
+            //println!("Snimanje {:?}", name);
             
-            let name = name.unwrap_or_else(|| "sladja".to_string());
+            let name = name.unwrap_or_else(|| "audio_recording".to_string());
             let mut clip = AudioKlip::record(name)?.resample(44100);
             baza.save(&mut clip)?;
         }
 
         Commands::Play { name } => {
             if let Some(clip) = baza.load(&name)? {
-                println!("Reprodukcija {:?}", name);
+                //println!("Reprodukcija {:?}", name);
                 clip.play()?;
             }
             else {
@@ -72,19 +72,22 @@ fn main() -> Result<()> {
         }
 
         Commands::List{} => {
+            println!("\nLista audio zapisa:\n");
+            println!("\tid\tnaziv\n");
             for pod in baza.list()? {
-                println!("{} {}", pod.id, pod.name);
+                println!("\t{}\t{}", pod.id, pod.name);
             }
             
         }
         Commands::Delete {name} => {
 
-            println!("Brisanje {:?}", name);
+            println!("\nBrisanje {:?} u toku.", name);
             baza.delete(&name)?;
 
-            println!("Trenutno stanje:");
+            println!("\nTrenutna lista audio zapisa:\n");
+            println!("\tid\tnaziv\n");
             for pod in baza.list()? {
-                println!("{} {}", pod.id, pod.name);
+                println!("\t{}\t{}", pod.id, pod.name);
             }
         }
     }
