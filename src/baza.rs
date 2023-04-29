@@ -17,7 +17,15 @@ fn encode(samples: &[f32]) -> Vec<u8> {
 	}
 	data
 }
-//decode
+
+fn decode(bytes: &[u8]) -> Vec<f32> {
+	let mut samples = Vec::with_capacity(bytes.len()/4);
+	for chunk in bytes.chunks(4) {
+		samples.push(f32::from_be_bytes([chunk[0], chunk[1], chunk[2], chunk[3]]));
+	}
+	samples
+}
+//kraj ref3 
 
 impl Baza{
 	pub fn open() -> Result<Baza> {
@@ -27,6 +35,7 @@ impl Baza{
 			"
 			CREATE TABLE IF NOT EXISTS baza (
 			id INTEGER PRIMARY KEY,
+			name TEXT NOT NULL UNIQUE,
 			sRates INTEGER NOT NULL,
 			samples BLOB NOT NULL
 			);
@@ -39,9 +48,10 @@ impl Baza{
 
 	pub fn save(&self, clip: &mut AudioKlip) -> Result<()> {
 		self.0.execute(
-			"INSERT OR REPLACE INTO baza (id, sRates, samples) VALUES (?1, ?2, ?3, ?4, ?5)",
+			"INSERT OR REPLACE INTO baza (id, name, sRates, samples) VALUES (?1, ?2, ?3, ?4)",
 			params![
 			clip.id,
+			clip.name,
 			clip.sRates,
 			encode(&clip.samples),
 			],
@@ -52,4 +62,28 @@ impl Baza{
 
 		Ok(())
 	}
+
+	pub fn load(&self, name: &str) -> Result<Option<AudioKlip>> {
+		let mut stm = self.0.prepare("SELECT id, name, sRates, samples FROM baza WHERE name = ?1")?;
+		let mut st_mach = stm.query_map([name], |row| {		// Kao state masina iz grafike, prvo je napravimo pa je podignemo
+			let sampl: Vec<u8> = row.get(3)?;
+
+			Ok(AudioKlip{
+				id: Some(row.get(0)?),
+				name: row.get(1)?,
+				sRates: row.get(2)?,
+				samples: decode(&sampl),
+			})
+		})?;												// bez ? - query_map, sa ? - (query_map, err) 
+															//!!!!!!!!!!!!!!!!!
+
+		Ok(if let Some(clip) = st_mach.next() {
+				Some(clip?)
+			}
+			else {
+				None
+			})
+
+	}
+	
 }

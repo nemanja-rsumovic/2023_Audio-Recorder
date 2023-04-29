@@ -51,28 +51,32 @@ fn main() -> Result<()> {
     
     match args.command{                     // Switch na osnovu komande
 
-        Commands:: Record{name} => {
-            eprintln!("Record {:?}", name);
+        Commands::Record{name} => {
+            eprintln!("Snimanje {:?}", name);
             
             let name = name.unwrap_or_else(|| "sladja".to_string());
             let mut clip = AudioKlip::record(name)?.resample(44100);
-            baza.save(&mut clip);
-
-
-            clip.play()?;
-            todo!(); //jos baza
+            baza.save(&mut clip)?;
+            todo!();
         }
 
-        Commands:: Play{name} => {
-            eprintln!("Play {}", name);
+        Commands::Play{name} => {
+            if let Some(clip) = baza.load(&name)? {
+                eprintln!("Reprodukcija {:?}", name);
+                clip.play()?;
+            }
+            else {
+                eprintln!("Audio zapis sa tim imenom ne postoji!");
+            }
             todo!();
+            
         }
 
         Commands::List{} => {
             todo!();
         }
         Commands::Delete {name} => {
-            eprintln!("Delete {}", name);
+            eprintln!("Brisanje {}", name);
             todo!();
         }
     }

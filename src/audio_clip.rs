@@ -16,7 +16,8 @@ use dasp::Signal;
 #[derive(Clone)]        // zarad dubokog kopiranja pri resamplingu za usaglasavanje
                         // in/out frekvencija
 pub struct AudioKlip {
-    pub id: Option<usize>, 
+    pub id: Option<usize>,
+    pub name: String,
     pub samples: Vec<f32>,
     pub sRates: u32,
 }
@@ -38,7 +39,8 @@ impl AudioKlip {
         let config = device.default_input_config()?;
 
         let clip = AudioKlip {
-            id:None,
+            id: None,
+            name,  
             samples: Vec::new(),
             sRates: config.sample_rate().0,
         };
@@ -56,7 +58,7 @@ impl AudioKlip {
         type ClipHandle = Arc<Mutex<Option<AudioKlip>>>;
 
         let streamerr = move |err| {
-            eprintln!("greska na stream-u: {}", err);
+            eprintln!("Greska na stream-u: {}", err);
         };
 
         // referenca1
@@ -98,7 +100,7 @@ impl AudioKlip {
         // zapoceto snimanje
         stream.play()?;
 
-        std::thread::sleep(std::time::Duration::from_secs(18));
+        std::thread::sleep(std::time::Duration::from_secs(5));
         //zatvaranje
         drop(stream);
         println!("Snimanje uspesno zavrseno!");
@@ -132,6 +134,7 @@ impl AudioKlip {
 
         AudioKlip {
             id: self.id,
+            name: self.name.clone(),
             samples: signal 
                 .from_hz_to_hz(linear, self.sRates as f64, sRates as f64)
                 .take(self.samples.len() * (sRates as usize) / (self.sRates as usize))      //ref2
@@ -163,7 +166,7 @@ impl AudioKlip {
         let channels = config.channels();
 
         let streamerr = move |err| {
-            eprintln!("greska na stream-u: {}", err);
+            eprintln!("Greska na stream-u: {}", err);
         };
 
         // referenca na referencu1
@@ -204,7 +207,7 @@ impl AudioKlip {
         };
 
         stream.play()?;
-        std::thread::sleep(std::time::Duration::from_secs(18));
+        std::thread::sleep(std::time::Duration::from_secs(5));
 
         Ok(())
         
