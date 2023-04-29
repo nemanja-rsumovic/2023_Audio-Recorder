@@ -9,6 +9,11 @@ use crate::audio_clip::AudioKlip;
 
 pub struct Baza(Connection);
 
+pub struct Podaci{
+	pub id: usize,
+	pub name: String,
+}
+
 //referenca3
 fn encode(samples: &[f32]) -> Vec<u8> {
 	let mut data = Vec::with_capacity(samples.len()*4);
@@ -75,7 +80,7 @@ impl Baza{
 				samples: decode(&sampl),
 			})
 		})?;												// bez ? - query_map, sa ? - (query_map, err) 
-															//!!!!!!!!!!!!!!!!!
+	
 
 		Ok(if let Some(clip) = st_mach.next() {
 				Some(clip?)
@@ -84,6 +89,26 @@ impl Baza{
 				None
 			})
 
+	}
+
+	pub fn list(&self) -> Result<Vec<Podaci>>{
+		let mut stm = self.0.prepare("SELECT id, name FROM baza ORDER BY name")?;
+		let st_mach = stm.query_map([], |row| {
+			Ok(Podaci{
+				id: row.get(0)?,
+				name: row.get(1)?,
+			})
+		})?;
+	
+		Ok(st_mach.collect::<Result<_, rusqlite::Error>>()?)
+	}
+
+	pub fn delete(&self, name: &str) -> Result<()> {
+		self.0.execute(
+			"DELETE FROM baza WHERE name = ?1", [name]
+			)?;
+
+		Ok(())
 	}
 	
 }
