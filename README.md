@@ -16,7 +16,7 @@ sudo apt-get install libsqlite3-dev
  ```
  
  preuzimanje projekta:
- ```
+ ```bash
  git clone https://github.com/matf-pp/2023_Audio-Recorder
  cd 2023_Audio-Recorder
  ```
