@@ -7,6 +7,9 @@ Projekat izrađen u okviru kursa [Programske paradigme](http://www.programskijez
 
 Aplikacija Audio-Recorder namenjena je za snimanje zvuka i predviđena je za rad u terminalu.
 
+## Demo
+[![YouTube video](https://i9.ytimg.com/vi_webp/NZaSFzJXfBM/mq1.webp?sqp=CLiiz6MG-oaymwEmCMACELQB8quKqQMa8AEB-AHOCIAC0AWKAgwIABABGDUgWihyMA8=&rs=AOn4CLBDDWWpAW_Gve89Q7wyrXs8cpk0tA)](https://www.youtube.com/watch?v=NZaSFzJXfBM)
+
 ## Neophodni alati
  [Rust i Cargo](https://doc.rust-lang.org/cargo/getting-started/installation.html)
  
